@@ -14,6 +14,7 @@ interface FeedPost {
   caption?: string;
   created_at: string;
   user_id: string;
+  session_id?: string;
   class_id?: string;
   username: string;
   display_name: string;
@@ -196,7 +197,70 @@ const Dashboard = () => {
         };
       }) || [];
 
-      setPosts(enrichedPosts);
+      // Add fake friend posts for demo (if no real posts exist)
+      const fakePosts: FeedPost[] = [
+        {
+          id: 'fake-1',
+          user_id: 'fake-user-1',
+          session_id: 'fake-session-1',
+          photo_url: 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=800&q=80',
+          minutes_studied: 40,
+          class_id: null,
+          class_name: 'CS220',
+          created_at: new Date(Date.now() - 2 * 60 * 1000).toISOString(),
+          username: 'allen_codes',
+          display_name: 'Allen',
+          user_photo_url: undefined,
+          caption: 'Finally cracked this algorithm 💻'
+        },
+        {
+          id: 'fake-2',
+          user_id: 'fake-user-2',
+          session_id: 'fake-session-2',
+          photo_url: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&q=80',
+          minutes_studied: 35,
+          class_id: null,
+          class_name: 'IT101',
+          created_at: new Date(Date.now() - 18 * 60 * 1000).toISOString(),
+          username: 'amani_tech',
+          display_name: 'Amani',
+          user_photo_url: undefined,
+          caption: 'Late night grind 🌙'
+        },
+        {
+          id: 'fake-3',
+          user_id: 'fake-user-3',
+          session_id: 'fake-session-3',
+          photo_url: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&q=80',
+          minutes_studied: 52,
+          class_id: null,
+          class_name: 'MATH301',
+          created_at: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
+          username: 'jordan_math',
+          display_name: 'Jordan',
+          user_photo_url: undefined,
+          caption: 'Calculus never felt so good ✨'
+        }
+      ];
+
+      // Add fake reactions for demo posts
+      const fakeReactions: Reaction[] = [
+        { id: 'fake-r1', post_id: 'fake-1', user_id: 'fake-user-4', emoji: '🔥' },
+        { id: 'fake-r2', post_id: 'fake-1', user_id: 'fake-user-5', emoji: '🔥' },
+        { id: 'fake-r3', post_id: 'fake-1', user_id: 'fake-user-6', emoji: '🤓' },
+        { id: 'fake-r4', post_id: 'fake-2', user_id: 'fake-user-4', emoji: '💪' },
+        { id: 'fake-r5', post_id: 'fake-2', user_id: 'fake-user-5', emoji: '☕' },
+        { id: 'fake-r6', post_id: 'fake-3', user_id: 'fake-user-4', emoji: '🔥' },
+        { id: 'fake-r7', post_id: 'fake-3', user_id: 'fake-user-5', emoji: '🔥' },
+        { id: 'fake-r8', post_id: 'fake-3', user_id: 'fake-user-6', emoji: '🤓' },
+      ];
+
+      // Combine real posts with fake posts (real posts first)
+      const allPosts = enrichedPosts.length > 0 ? enrichedPosts : [...fakePosts];
+      const allReactions = [...(reactionsData || []), ...fakeReactions];
+
+      setPosts(allPosts);
+      setReactions(allReactions);
     } catch (error: any) {
       toast({
         title: "Failed to load feed",
