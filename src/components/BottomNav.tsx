@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Home, Camera, User, Calendar } from 'lucide-react';
+import { Home, Camera, User, Calendar, Heart } from 'lucide-react';
 
 const BottomNav = () => {
   return (
@@ -24,6 +24,21 @@ const BottomNav = () => {
             <>
               <Home className={`w-7 h-7 ${isActive ? 'fill-white' : ''}`} />
               <span className="text-xs font-medium">Home</span>
+            </>
+          )}
+        </NavLink>
+
+        {/* Feed */}
+        <NavLink
+          to="/feed"
+          className={({ isActive }) => `flex flex-col items-center justify-center gap-1 min-w-[70px] transition-colors ${
+            isActive ? 'text-white' : 'text-[#888888]'
+          }`}
+        >
+          {({ isActive }) => (
+            <>
+              <Heart className={`w-7 h-7 ${isActive ? 'fill-white' : ''}`} />
+              <span className="text-xs font-medium">Feed</span>
             </>
           )}
         </NavLink>
