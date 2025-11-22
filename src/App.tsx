@@ -15,6 +15,7 @@ import AIProcessing from "./pages/AIProcessing";
 import AssignmentSummary from "./pages/AssignmentSummary";
 import StudyPlan from "./pages/StudyPlan";
 import Home from "./pages/Home";
+import Calendar from "./pages/Calendar";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/assignment-summary/:classId" element={<AssignmentSummary />} />
             <Route path="/study-plan/:classId" element={<StudyPlan />} />
             <Route path="/home" element={<Home />} />
+            <Route path="/calendar" element={<Calendar />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

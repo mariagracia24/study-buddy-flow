@@ -1,9 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { useOnboarding } from '@/contexts/OnboardingContext';
 import { Calendar, Flame } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
   const { state } = useOnboarding();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -42,7 +44,7 @@ const Home = () => {
           </div>
         </div>
 
-        <Button variant="outline" className="w-full h-14" size="lg">
+        <Button variant="outline" className="w-full h-14" size="lg" onClick={() => navigate('/calendar')}>
           <Calendar className="h-5 w-5 mr-2" />
           View Full Calendar
         </Button>
