@@ -14,7 +14,128 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      assignments: {
+        Row: {
+          class_id: string
+          created_at: string | null
+          description: string | null
+          due_date: string | null
+          estimated_minutes: number | null
+          id: string
+          title: string
+          type: string | null
+          user_id: string
+        }
+        Insert: {
+          class_id: string
+          created_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          estimated_minutes?: number | null
+          id?: string
+          title: string
+          type?: string | null
+          user_id: string
+        }
+        Update: {
+          class_id?: string
+          created_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          estimated_minutes?: number | null
+          id?: string
+          title?: string
+          type?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assignments_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      classes: {
+        Row: {
+          ai_parsed: boolean | null
+          created_at: string | null
+          id: string
+          name: string
+          syllabus_url: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          ai_parsed?: boolean | null
+          created_at?: string | null
+          id?: string
+          name: string
+          syllabus_url?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          ai_parsed?: boolean | null
+          created_at?: string | null
+          id?: string
+          name?: string
+          syllabus_url?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      study_blocks: {
+        Row: {
+          assignment_id: string | null
+          block_date: string
+          class_id: string
+          created_at: string | null
+          duration_minutes: number
+          id: string
+          start_time: string | null
+          user_id: string
+        }
+        Insert: {
+          assignment_id?: string | null
+          block_date: string
+          class_id: string
+          created_at?: string | null
+          duration_minutes: number
+          id?: string
+          start_time?: string | null
+          user_id: string
+        }
+        Update: {
+          assignment_id?: string | null
+          block_date?: string
+          class_id?: string
+          created_at?: string | null
+          duration_minutes?: number
+          id?: string
+          start_time?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_blocks_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "assignments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "study_blocks_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
