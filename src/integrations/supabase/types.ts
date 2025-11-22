@@ -62,36 +62,48 @@ export type Database = {
         Row: {
           ai_parsed: boolean | null
           created_at: string | null
+          difficulty: string | null
+          estimated_remaining_minutes: number | null
+          estimated_total_minutes: number | null
           id: string
           last_studied_date: string | null
           name: string
           progress_percentage: number | null
           streak: number | null
           syllabus_url: string | null
+          title: string | null
           updated_at: string | null
           user_id: string
         }
         Insert: {
           ai_parsed?: boolean | null
           created_at?: string | null
+          difficulty?: string | null
+          estimated_remaining_minutes?: number | null
+          estimated_total_minutes?: number | null
           id?: string
           last_studied_date?: string | null
           name: string
           progress_percentage?: number | null
           streak?: number | null
           syllabus_url?: string | null
+          title?: string | null
           updated_at?: string | null
           user_id: string
         }
         Update: {
           ai_parsed?: boolean | null
           created_at?: string | null
+          difficulty?: string | null
+          estimated_remaining_minutes?: number | null
+          estimated_total_minutes?: number | null
           id?: string
           last_studied_date?: string | null
           name?: string
           progress_percentage?: number | null
           streak?: number | null
           syllabus_url?: string | null
+          title?: string | null
           updated_at?: string | null
           user_id?: string
         }
@@ -129,39 +141,75 @@ export type Database = {
           },
         ]
       }
+      daily_calendar: {
+        Row: {
+          blocks: Json | null
+          created_at: string | null
+          date: string
+          id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          blocks?: Json | null
+          created_at?: string | null
+          date: string
+          id?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          blocks?: Json | null
+          created_at?: string | null
+          date?: string
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       feed_posts: {
         Row: {
+          back_photo_url: string | null
           caption: string | null
           class_id: string | null
           created_at: string | null
+          front_photo_url: string | null
           id: string
           minutes_studied: number
           photo_url: string
           session_id: string
           timelapse_url: string | null
           user_id: string
+          visibility: string | null
         }
         Insert: {
+          back_photo_url?: string | null
           caption?: string | null
           class_id?: string | null
           created_at?: string | null
+          front_photo_url?: string | null
           id?: string
           minutes_studied: number
           photo_url: string
           session_id: string
           timelapse_url?: string | null
           user_id: string
+          visibility?: string | null
         }
         Update: {
+          back_photo_url?: string | null
           caption?: string | null
           class_id?: string | null
           created_at?: string | null
+          front_photo_url?: string | null
           id?: string
           minutes_studied?: number
           photo_url?: string
           session_id?: string
           timelapse_url?: string | null
           user_id?: string
+          visibility?: string | null
         }
         Relationships: [
           {
@@ -201,14 +249,45 @@ export type Database = {
         }
         Relationships: []
       }
+      pinky_promises: {
+        Row: {
+          block_id: string
+          created_at: string | null
+          date: string
+          id: string
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          block_id: string
+          created_at?: string | null
+          date: string
+          id?: string
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          block_id?: string
+          created_at?: string | null
+          date?: string
+          id?: string
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           bio: string | null
+          calendar_connected: boolean | null
           created_at: string | null
           display_name: string
+          earliest_study_time: string | null
+          google_calendar_id: string | null
           id: string
           joined_at: string | null
           last_study_date: string | null
+          latest_study_time: string | null
           longest_streak: number | null
           photo_url: string | null
           streak: number | null
@@ -216,14 +295,20 @@ export type Database = {
           updated_at: string | null
           user_id: string
           username: string
+          weekday_study_range: string | null
+          weekend_study_range: string | null
         }
         Insert: {
           bio?: string | null
+          calendar_connected?: boolean | null
           created_at?: string | null
           display_name: string
+          earliest_study_time?: string | null
+          google_calendar_id?: string | null
           id?: string
           joined_at?: string | null
           last_study_date?: string | null
+          latest_study_time?: string | null
           longest_streak?: number | null
           photo_url?: string | null
           streak?: number | null
@@ -231,14 +316,20 @@ export type Database = {
           updated_at?: string | null
           user_id: string
           username: string
+          weekday_study_range?: string | null
+          weekend_study_range?: string | null
         }
         Update: {
           bio?: string | null
+          calendar_connected?: boolean | null
           created_at?: string | null
           display_name?: string
+          earliest_study_time?: string | null
+          google_calendar_id?: string | null
           id?: string
           joined_at?: string | null
           last_study_date?: string | null
+          latest_study_time?: string | null
           longest_streak?: number | null
           photo_url?: string | null
           streak?: number | null
@@ -246,6 +337,8 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
           username?: string
+          weekday_study_range?: string | null
+          weekend_study_range?: string | null
         }
         Relationships: []
       }
@@ -332,37 +425,52 @@ export type Database = {
       study_sessions: {
         Row: {
           assignment_id: string | null
+          back_photo_url: string | null
+          block_id: string | null
           class_id: string | null
           completed_at: string
           created_at: string | null
+          front_photo_url: string | null
           id: string
           minutes_studied: number
           photo_url: string | null
           started_at: string
+          status: string | null
+          target_minutes: number | null
           timelapse_url: string | null
           user_id: string
         }
         Insert: {
           assignment_id?: string | null
+          back_photo_url?: string | null
+          block_id?: string | null
           class_id?: string | null
           completed_at: string
           created_at?: string | null
+          front_photo_url?: string | null
           id?: string
           minutes_studied: number
           photo_url?: string | null
           started_at: string
+          status?: string | null
+          target_minutes?: number | null
           timelapse_url?: string | null
           user_id: string
         }
         Update: {
           assignment_id?: string | null
+          back_photo_url?: string | null
+          block_id?: string | null
           class_id?: string | null
           completed_at?: string
           created_at?: string | null
+          front_photo_url?: string | null
           id?: string
           minutes_studied?: number
           photo_url?: string | null
           started_at?: string
+          status?: string | null
+          target_minutes?: number | null
           timelapse_url?: string | null
           user_id?: string
         }
@@ -376,6 +484,82 @@ export type Database = {
           },
           {
             foreignKeyName: "study_sessions_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      syllabus_assignments: {
+        Row: {
+          class_id: string
+          created_at: string | null
+          due_date: string | null
+          estimated_minutes: number
+          id: string
+          title: string
+          type: string | null
+        }
+        Insert: {
+          class_id: string
+          created_at?: string | null
+          due_date?: string | null
+          estimated_minutes?: number
+          id?: string
+          title: string
+          type?: string | null
+        }
+        Update: {
+          class_id?: string
+          created_at?: string | null
+          due_date?: string | null
+          estimated_minutes?: number
+          id?: string
+          title?: string
+          type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "syllabus_assignments_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      syllabus_topics: {
+        Row: {
+          class_id: string
+          created_at: string | null
+          description: string | null
+          estimated_minutes: number
+          id: string
+          order_index: number
+          title: string
+        }
+        Insert: {
+          class_id: string
+          created_at?: string | null
+          description?: string | null
+          estimated_minutes?: number
+          id?: string
+          order_index?: number
+          title: string
+        }
+        Update: {
+          class_id?: string
+          created_at?: string | null
+          description?: string | null
+          estimated_minutes?: number
+          id?: string
+          order_index?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "syllabus_topics_class_id_fkey"
             columns: ["class_id"]
             isOneToOne: false
             referencedRelation: "classes"
