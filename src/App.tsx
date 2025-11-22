@@ -16,6 +16,9 @@ import AssignmentSummary from "./pages/AssignmentSummary";
 import StudyPlan from "./pages/StudyPlan";
 import Home from "./pages/Home";
 import Calendar from "./pages/Calendar";
+import Profile from "./pages/Profile";
+import Leaderboard from "./pages/Leaderboard";
+import Feed from "./pages/Feed";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +43,9 @@ const App = () => (
             <Route path="/study-plan/:classId" element={<StudyPlan />} />
             <Route path="/home" element={<Home />} />
             <Route path="/calendar" element={<Calendar />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/feed" element={<Feed />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

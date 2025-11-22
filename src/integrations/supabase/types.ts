@@ -88,6 +88,190 @@ export type Database = {
         }
         Relationships: []
       }
+      comments: {
+        Row: {
+          created_at: string | null
+          id: string
+          post_id: string
+          text: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          post_id: string
+          text: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          post_id?: string
+          text?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "feed_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feed_posts: {
+        Row: {
+          caption: string | null
+          class_id: string | null
+          created_at: string | null
+          id: string
+          minutes_studied: number
+          photo_url: string
+          session_id: string
+          timelapse_url: string | null
+          user_id: string
+        }
+        Insert: {
+          caption?: string | null
+          class_id?: string | null
+          created_at?: string | null
+          id?: string
+          minutes_studied: number
+          photo_url: string
+          session_id: string
+          timelapse_url?: string | null
+          user_id: string
+        }
+        Update: {
+          caption?: string | null
+          class_id?: string | null
+          created_at?: string | null
+          id?: string
+          minutes_studied?: number
+          photo_url?: string
+          session_id?: string
+          timelapse_url?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feed_posts_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feed_posts_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "study_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      friendships: {
+        Row: {
+          created_at: string | null
+          friend_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          friend_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          friend_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          bio: string | null
+          created_at: string | null
+          display_name: string
+          id: string
+          joined_at: string | null
+          last_study_date: string | null
+          longest_streak: number | null
+          photo_url: string | null
+          streak: number | null
+          total_minutes: number | null
+          updated_at: string | null
+          user_id: string
+          username: string
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string | null
+          display_name: string
+          id?: string
+          joined_at?: string | null
+          last_study_date?: string | null
+          longest_streak?: number | null
+          photo_url?: string | null
+          streak?: number | null
+          total_minutes?: number | null
+          updated_at?: string | null
+          user_id: string
+          username: string
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string | null
+          display_name?: string
+          id?: string
+          joined_at?: string | null
+          last_study_date?: string | null
+          longest_streak?: number | null
+          photo_url?: string | null
+          streak?: number | null
+          total_minutes?: number | null
+          updated_at?: string | null
+          user_id?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      reactions: {
+        Row: {
+          created_at: string | null
+          emoji: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          emoji: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          emoji?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reactions_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "feed_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       study_blocks: {
         Row: {
           assignment_id: string | null
@@ -136,12 +320,69 @@ export type Database = {
           },
         ]
       }
+      study_sessions: {
+        Row: {
+          assignment_id: string | null
+          class_id: string | null
+          completed_at: string
+          created_at: string | null
+          id: string
+          minutes_studied: number
+          photo_url: string | null
+          started_at: string
+          timelapse_url: string | null
+          user_id: string
+        }
+        Insert: {
+          assignment_id?: string | null
+          class_id?: string | null
+          completed_at: string
+          created_at?: string | null
+          id?: string
+          minutes_studied: number
+          photo_url?: string | null
+          started_at: string
+          timelapse_url?: string | null
+          user_id: string
+        }
+        Update: {
+          assignment_id?: string | null
+          class_id?: string | null
+          completed_at?: string
+          created_at?: string | null
+          id?: string
+          minutes_studied?: number
+          photo_url?: string | null
+          started_at?: string
+          timelapse_url?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_sessions_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "assignments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "study_sessions_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      update_user_streak: {
+        Args: { p_minutes: number; p_user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
