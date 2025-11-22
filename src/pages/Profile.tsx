@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Share2, Sparkles, BookOpen, Flame, Clock, Users, UserPlus, ChevronRight } from 'lucide-react';
+import { Share2, Sparkles, BookOpen, Flame, Clock, Users, UserPlus, ChevronRight, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -42,7 +42,7 @@ interface Post {
 }
 
 const Profile = () => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -396,6 +396,33 @@ const Profile = () => {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Logout Button - For Testing */}
+        <div className="pt-6 pb-4">
+          <Button
+            onClick={async () => {
+              try {
+                await signOut();
+                toast({
+                  title: "Signed out",
+                  description: "You have been signed out successfully.",
+                });
+                navigate('/');
+              } catch (error: any) {
+                toast({
+                  variant: "destructive",
+                  title: "Sign out failed",
+                  description: error.message,
+                });
+              }
+            }}
+            variant="outline"
+            className="w-full border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Sign Out
+          </Button>
         </div>
 
       </div>
