@@ -31,6 +31,16 @@ import GeminiStudyPlan from "./pages/GeminiStudyPlan";
 import TodayStudy from "./pages/TodayStudy";
 import Layout from "./components/Layout";
 import NotFound from "./pages/NotFound";
+import UploadSyllabus from "./pages/UploadSyllabus";
+import AIScanning from "./pages/AIScanning";
+import StudyPlanPreview from "./pages/StudyPlanPreview";
+import TimePreferences from "./pages/TimePreferences";
+import FinalSchedule from "./pages/FinalSchedule";
+import ProfileView from "./pages/ProfileView";
+import StudyReminder from "./pages/StudyReminder";
+import StudyBuddiesFeed from "./pages/StudyBuddiesFeed";
+import LeaderboardView from "./pages/LeaderboardView";
+import CalendarView from "./pages/CalendarView";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +58,13 @@ const App = () => (
             <Route path="/account-setup" element={<AccountSetup />} />
             <Route path="/login" element={<Login />} />
             <Route path="/add-classes" element={<AddClasses />} />
+            <Route path="/upload-syllabus" element={<UploadSyllabus />} />
+            <Route path="/ai-processing/:classId" element={<AIScanning />} />
+            <Route path="/study-plan-preview/:classId" element={<StudyPlanPreview />} />
+            <Route path="/time-preferences" element={<TimePreferences />} />
+            <Route path="/final-schedule" element={<FinalSchedule />} />
+            <Route path="/study-reminder" element={<StudyReminder />} />
+            <Route path="/profile-view" element={<ProfileView />} />
             
             {/* Class Management - No Nav */}
             <Route path="/class/:classId" element={<ClassDetail />} />
@@ -73,9 +90,10 @@ const App = () => (
             
             {/* Other - With Nav */}
             <Route path="/home" element={<Layout><Home /></Layout>} />
-            <Route path="/calendar" element={<Layout><Calendar /></Layout>} />
-            <Route path="/leaderboard" element={<Layout><Leaderboard /></Layout>} />
+            <Route path="/calendar" element={<Layout><CalendarView /></Layout>} />
+            <Route path="/leaderboard" element={<Layout><LeaderboardView /></Layout>} />
             <Route path="/feed" element={<Layout><Feed /></Layout>} />
+            <Route path="/study-buddies-feed" element={<Layout><StudyBuddiesFeed /></Layout>} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
