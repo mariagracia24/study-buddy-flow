@@ -32,9 +32,17 @@ cd <YOUR_PROJECT_NAME>
 # Step 3: Install the necessary dependencies.
 npm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Step 4: Set up environment variables (REQUIRED)
+# Copy .env.example to .env and fill in your Supabase credentials
+# See SETUP_FOR_NEW_DEVELOPERS.md for detailed instructions
+cp .env.example .env
+# Then edit .env with your Supabase URL and API key
+
+# Step 5: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
+
+**⚠️ Important:** You must create a `.env` file with your Supabase credentials before running the app. See `SETUP_FOR_NEW_DEVELOPERS.md` for detailed setup instructions.
 
 **Edit a file directly in GitHub**
 
