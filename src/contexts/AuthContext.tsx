@@ -114,20 +114,45 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
+        setLoading(false);
       }
     );
 
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setSession(session);
-        setUser(session.user);
+    // Check for existing session with timeout and error handling
+    let loadingComplete = false;
+    
+    const checkSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error('Error getting session:', error);
+        }
+        if (session) {
+          setSession(session);
+          setUser(session.user);
+        }
+      } catch (error) {
+        console.error('Error checking session:', error);
+      } finally {
+        loadingComplete = true;
+        setLoading(false);
       }
-      setLoading(false);
-      // Removed auto-login - users must sign in manually
-    });
+    };
 
-    return () => subscription.unsubscribe();
+    // Add timeout to prevent infinite loading
+    const timeout = setTimeout(() => {
+      if (!loadingComplete) {
+        console.warn('Auth check timed out, setting loading to false');
+        setLoading(false);
+      }
+    }, 5000); // 5 second timeout
+
+    checkSession();
+
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timeout);
+    };
   }, []);
 
   return (

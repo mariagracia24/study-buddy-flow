@@ -23,6 +23,18 @@ const Splash = () => {
     }
   }, [navigate, user, loading]);
 
+  // Show loading indicator if auth is still loading
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background relative overflow-hidden">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background relative overflow-hidden">
       {/* Animated gradient background */}

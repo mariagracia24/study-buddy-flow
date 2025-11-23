@@ -13,18 +13,41 @@ serve(async (req) => {
   }
 
   try {
-    const { userId, classIds } = await req.json();
-    
-    console.log('Creating demo posts for user:', userId);
+    // Validate environment variables first
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    if (!supabaseUrl) {
+      throw new Error('SUPABASE_URL environment variable is not set');
+    }
+    if (!supabaseKey) {
+      throw new Error('SUPABASE_SERVICE_ROLE_KEY environment variable is not set');
+    }
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY environment variable is not set');
+    }
+
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY not configured');
+    // Parse and validate request body
+    let requestBody;
+    try {
+      requestBody = await req.json();
+    } catch (e) {
+      throw new Error('Invalid request body: ' + (e instanceof Error ? e.message : 'Unknown error'));
     }
+
+    const { userId, classIds } = requestBody;
+    
+    if (!userId) {
+      throw new Error('userId is required');
+    }
+    if (!classIds || !Array.isArray(classIds) || classIds.length === 0) {
+      throw new Error('classIds must be a non-empty array');
+    }
+    
+    console.log('Creating demo posts for user:', userId, 'with classes:', classIds);
 
     // Study photo prompts
     const photoPrompts = [
@@ -69,7 +92,9 @@ serve(async (req) => {
       });
 
       if (!imageResponse.ok) {
-        console.error('Image generation failed:', await imageResponse.text());
+        const errorText = await imageResponse.text();
+        console.error(`Image generation failed for photo ${i + 1}:`, errorText);
+        // Continue to next photo if image generation fails
         continue;
       }
 
@@ -108,7 +133,11 @@ serve(async (req) => {
         .single();
 
       if (sessionError) {
-        console.error('Error creating session:', sessionError);
+        console.error(`Error creating session ${i + 1}:`, JSON.stringify(sessionError, null, 2));
+        // Return detailed error if this is the first failure
+        if (i === 0) {
+          throw new Error(`Failed to create study session: ${sessionError.message || JSON.stringify(sessionError)}`);
+        }
         continue;
       }
 
@@ -129,7 +158,11 @@ serve(async (req) => {
         .single();
 
       if (postError) {
-        console.error('Error creating post:', postError);
+        console.error(`Error creating post ${i + 1}:`, JSON.stringify(postError, null, 2));
+        // Return detailed error if this is the first failure
+        if (i === 0) {
+          throw new Error(`Failed to create feed post: ${postError.message || JSON.stringify(postError)}`);
+        }
         continue;
       }
 
@@ -148,10 +181,16 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Error creating demo posts:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorDetails = error instanceof Error ? error.stack : String(error);
+    
+    console.error('Error creating demo posts:', errorMessage);
+    console.error('Error details:', errorDetails);
+    
     return new Response(
       JSON.stringify({ 
-        error: error instanceof Error ? error.message : 'Unknown error' 
+        error: errorMessage,
+        details: Deno.env.get('DENO_ENV') === 'development' ? errorDetails : undefined
       }),
       { 
         status: 500, 

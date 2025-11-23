@@ -93,10 +93,11 @@ const Dashboard = () => {
       // Always load classes and feed
       await loadClasses();
       await loadFeed();
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load dashboard';
       toast({
         title: "Failed to load dashboard",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -110,44 +111,50 @@ const Dashboard = () => {
     try {
       const today = new Date().toISOString().split('T')[0];
       
-      const { data: blocksData } = await supabase
+      // Select only needed columns
+      const { data: blocksData, error: blocksError } = await supabase
         .from('study_blocks')
-        .select('*')
+        .select('id, class_id, assignment_id, duration_minutes, start_time, block_date')
         .eq('user_id', user.id)
         .eq('block_date', today)
         .order('start_time', { ascending: true })
         .limit(1);
 
+      if (blocksError) {
+        console.error('Error loading blocks:', blocksError);
+        return;
+      }
+
       if (blocksData && blocksData.length > 0) {
         const block = blocksData[0];
         
-        // Get class info
-        const { data: classData } = await supabase
-          .from('classes')
-          .select('name')
-          .eq('id', block.class_id)
-          .eq('user_id', user.id)
-          .single();
-
-        // Get assignment info if exists
-        let assignmentTitle = undefined;
-        if (block.assignment_id) {
-          const { data: assignmentData } = await supabase
-            .from('assignments')
-            .select('title')
-            .eq('id', block.assignment_id)
+        // Run queries in parallel
+        const [classResult, assignmentResult] = await Promise.all([
+          // Get class info
+          supabase
+            .from('classes')
+            .select('name')
+            .eq('id', block.class_id)
             .eq('user_id', user.id)
-            .single();
-          assignmentTitle = assignmentData?.title;
-        }
+            .single(),
+          // Get assignment info if exists
+          block.assignment_id
+            ? supabase
+                .from('assignments')
+                .select('title')
+                .eq('id', block.assignment_id)
+                .eq('user_id', user.id)
+                .single()
+            : Promise.resolve({ data: null, error: null })
+        ]);
 
         setTodayBlock({
           ...block,
-          class_name: classData?.name,
-          assignment_title: assignmentTitle
+          class_name: classResult.data?.name,
+          assignment_title: assignmentResult.data?.title
         });
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error loading today block:', error);
     }
   };
@@ -160,11 +167,15 @@ const Dashboard = () => {
         .from('classes')
         .select('id, name, progress_percentage, streak, last_studied_date')
         .eq('user_id', user.id)
-        .order('progress_percentage', { ascending: true }); // Show classes with lowest progress first (most urgent)
+        .order('progress_percentage', { ascending: true })
+        .limit(50); // Limit to prevent timeout with many classes
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error loading classes:', error);
+        throw error;
+      }
       setClasses(classesData || []);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error loading classes:', error);
     }
   };
@@ -173,11 +184,17 @@ const Dashboard = () => {
     if (!user) return;
 
     try {
-      // Get friendships
-      const { data: friendships } = await supabase
+      // Get friendships - optimized query
+      const { data: friendships, error: friendshipsError } = await supabase
         .from('friendships')
         .select('friend_id, user_id')
-        .or(`user_id.eq.${user.id},friend_id.eq.${user.id}`);
+        .or(`user_id.eq.${user.id},friend_id.eq.${user.id}`)
+        .limit(100); // Limit to prevent timeout with many friends
+
+      if (friendshipsError) {
+        console.error('Friendships error:', friendshipsError);
+        // Continue with just own posts if friendships query fails
+      }
 
       const friendIds = friendships?.map(f => 
         f.user_id === user.id ? f.friend_id : f.user_id
@@ -186,10 +203,10 @@ const Dashboard = () => {
       // Include own posts
       const allUserIds = [user.id, ...friendIds];
 
-      // Get posts - LIMIT to 20 most recent to avoid timeout
+      // Get posts - Select only needed columns and limit to prevent timeout
       const { data: postsData, error: postsError } = await supabase
         .from('feed_posts')
-        .select('*')
+        .select('id, user_id, session_id, photo_url, timelapse_url, minutes_studied, class_id, caption, created_at')
         .in('user_id', allUserIds)
         .order('created_at', { ascending: false })
         .limit(20);
@@ -199,27 +216,41 @@ const Dashboard = () => {
         throw postsError;
       }
 
-      // Get profiles
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('user_id, username, display_name, photo_url')
-        .in('user_id', allUserIds);
+      if (!postsData || postsData.length === 0) {
+        setPosts([]);
+        setReactions([]);
+        return;
+      }
 
-      // Get classes
-      const classIds = postsData?.map(p => p.class_id).filter(Boolean) || [];
-      const { data: classes } = await supabase
-        .from('classes')
-        .select('id, name')
-        .in('id', classIds);
+      // Run these queries in parallel for better performance
+      const classIds = postsData.map(p => p.class_id).filter(Boolean) as string[];
+      const postIds = postsData.map(p => p.id);
 
-      // Get reactions
-      const postIds = postsData?.map(p => p.id) || [];
-      const { data: reactionsData } = await supabase
-        .from('reactions')
-        .select('*')
-        .in('post_id', postIds);
+      const [profilesResult, classesResult, reactionsResult] = await Promise.all([
+        // Get profiles
+        supabase
+          .from('profiles')
+          .select('user_id, username, display_name, photo_url')
+          .in('user_id', allUserIds),
+        // Get classes (only if there are class IDs)
+        classIds.length > 0 
+          ? supabase
+              .from('classes')
+              .select('id, name')
+              .in('id', classIds)
+          : Promise.resolve({ data: [], error: null }),
+        // Get reactions
+        supabase
+          .from('reactions')
+          .select('id, post_id, user_id, emoji')
+          .in('post_id', postIds)
+      ]);
 
-      setReactions(reactionsData || []);
+      const profiles = profilesResult.data || [];
+      const classes = classesResult.data || [];
+      const reactionsData = reactionsResult.data || [];
+
+      setReactions(reactionsData);
 
       // Enrich posts
       const enrichedPosts = postsData?.map(post => {
@@ -294,14 +325,15 @@ const Dashboard = () => {
 
       // Combine real posts with fake posts (real posts first)
       const allPosts = enrichedPosts.length > 0 ? enrichedPosts : [...fakePosts];
-      const allReactions = [...(reactionsData || []), ...fakeReactions];
+      const allReactions = [...reactionsData, ...fakeReactions];
 
       setPosts(allPosts);
       setReactions(allReactions);
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load feed';
       toast({
         title: "Failed to load feed",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -347,10 +379,11 @@ const Dashboard = () => {
           emoji
         });
       }
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update reaction';
       toast({
         title: "Failed to update reaction",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     }
