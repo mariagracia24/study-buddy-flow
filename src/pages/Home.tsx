@@ -1,81 +1,125 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { useOnboarding } from '@/contexts/OnboardingContext';
-import { Calendar, Flame, Trophy, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { Home as HomeIcon, Users, User } from 'lucide-react';
 
 const Home = () => {
-  const { state } = useOnboarding();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState<'buddies' | 'leaderboard'>('buddies');
+
+  // Get display name from user metadata or email
+  const displayName = user?.user_metadata?.display_name || 
+                      user?.email?.split('@')[0]?.toUpperCase() || 
+                      'FRIEND';
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-2xl mx-auto space-y-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Welcome back!</h1>
-            <p className="text-muted-foreground">Ready to lock in?</p>
-          </div>
-          <div className="flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full">
-            <Flame className="h-5 w-5 text-primary" />
-            <span className="font-bold text-foreground">7 day streak</span>
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Blurred background - placeholder for now, will be real study photo */}
+      <div 
+        className="absolute inset-0 bg-gradient-to-br from-purple-900/40 via-blue-900/40 to-pink-900/40 backdrop-blur-2xl"
+        style={{
+          backgroundImage: 'url(https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=1200&q=80)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          filter: 'blur(20px)',
+        }}
+      />
+      
+      {/* Content */}
+      <div className="relative z-10 flex flex-col min-h-screen">
+        {/* Header */}
+        <div className="pt-8 pb-4 px-6 text-center">
+          <h1 className="text-3xl font-bold text-white mb-4">Nudge</h1>
+          
+          {/* Tabs */}
+          <div className="flex justify-center gap-6">
+            <button
+              onClick={() => setActiveTab('buddies')}
+              className={`text-base font-semibold pb-1 transition-all ${
+                activeTab === 'buddies'
+                  ? 'text-white border-b-2 border-white'
+                  : 'text-white/70'
+              }`}
+            >
+              My Study Buddies
+            </button>
+            <button
+              onClick={() => setActiveTab('leaderboard')}
+              className={`text-base font-semibold pb-1 transition-all ${
+                activeTab === 'leaderboard'
+                  ? 'text-white border-b-2 border-white'
+                  : 'text-white/70'
+              }`}
+            >
+              Leaderboard
+            </button>
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-primary via-accent to-secondary rounded-2xl p-6 text-primary-foreground glow-primary hover-scale cursor-pointer">
-          <h2 className="text-2xl font-bold mb-2">Today's Nudge</h2>
-          <p className="text-lg opacity-90 mb-4">Time to tackle BIO101 reading!</p>
-          <Button size="lg" variant="secondary" className="w-full font-black text-lg h-14">
-            Start Nudge Session
-          </Button>
+        {/* Main Content - Centered Nudge Card */}
+        <div className="flex-1 flex items-center justify-center px-6 pb-32">
+          <div 
+            className="w-full max-w-md rounded-3xl p-8 text-center space-y-6"
+            style={{
+              background: 'rgba(255, 255, 255, 0.15)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(48, 125, 255, 0.3)',
+              boxShadow: '0 8px 32px rgba(48, 125, 255, 0.2)',
+            }}
+          >
+            <h2 className="text-4xl font-black text-white">
+              HEY {displayName}
+            </h2>
+            
+            <p className="text-lg text-white/90 leading-relaxed">
+              Are you ready? Your next nudge is for CS 241. Be ready to share with friends.
+            </p>
+
+            <Button
+              onClick={() => navigate('/nudge-camera')}
+              className="w-full h-16 bg-[hsl(207,100%,57%)] hover:bg-[hsl(207,100%,50%)] text-white font-bold text-lg rounded-full shadow-lg"
+              style={{
+                boxShadow: '0 8px 24px rgba(35, 155, 255, 0.4)',
+              }}
+            >
+              Post your nudge
+            </Button>
+          </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-3 gap-3">
-          <Button 
-            variant="outline" 
-            className="h-24 flex-col gap-2 rounded-3xl hover-scale border-2" 
-            onClick={() => navigate('/feed')}
+        {/* Bottom Navigation */}
+        <div 
+          className="fixed bottom-0 left-0 right-0 h-20 flex items-center justify-around px-8 pb-safe"
+          style={{
+            background: 'linear-gradient(135deg, hsl(207, 100%, 57%), hsl(270, 80%, 60%))',
+          }}
+        >
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="flex flex-col items-center gap-1 text-[hsl(340,100%,70%)]"
           >
-            <Users className="h-6 w-6" />
-            <span className="text-xs font-bold">Feed</span>
-          </Button>
-          <Button 
-            variant="outline" 
-            className="h-24 flex-col gap-2 rounded-3xl hover-scale border-2"
-            onClick={() => navigate('/leaderboard')}
+            <HomeIcon className="w-6 h-6" />
+            <span className="text-xs font-semibold">Home</span>
+          </button>
+
+          <button
+            onClick={() => navigate('/buddies')}
+            className="flex flex-col items-center gap-1 text-white/70"
           >
-            <Trophy className="h-6 w-6" />
-            <span className="text-xs font-bold">Leaderboard</span>
-          </Button>
-          <Button 
-            variant="outline" 
-            className="h-24 flex-col gap-2 rounded-3xl hover-scale border-2"
+            <Users className="w-6 h-6" />
+            <span className="text-xs font-semibold">Friends</span>
+          </button>
+
+          <button
             onClick={() => navigate('/profile')}
+            className="flex flex-col items-center gap-1 text-white/70"
           >
-            <Flame className="h-6 w-6" />
-            <span className="text-xs font-bold">Profile</span>
-          </Button>
+            <User className="w-6 h-6" />
+            <span className="text-xs font-semibold">Profile</span>
+          </button>
         </div>
-
-        <div className="space-y-4">
-          <h3 className="text-xl font-bold text-foreground">Your Classes</h3>
-          <div className="grid gap-3">
-            {state.classes.map((classItem) => (
-              <div
-                key={classItem.id}
-                className="bg-card border border-border rounded-xl p-4"
-              >
-                <h4 className="font-semibold text-foreground">{classItem.name}</h4>
-                <p className="text-sm text-muted-foreground">Next session: Tomorrow at 4:00 PM</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <Button variant="outline" className="w-full h-14" size="lg" onClick={() => navigate('/calendar')}>
-          <Calendar className="h-5 w-5 mr-2" />
-          View Full Calendar
-        </Button>
       </div>
     </div>
   );

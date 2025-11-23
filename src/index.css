@@ -41,6 +41,13 @@ All colors MUST be HSL.
     /* Electric lime for highlights */
     --neon-lime: 75 100% 60%;
     
+    /* Nudge blob colors */
+    --blob-purple: 270 80% 60%;
+    --blob-yellow: 45 98% 70%;
+    --blob-orange: 25 95% 60%;
+    --blob-pink: 340 100% 70%;
+    --nudge-blue: 207 100% 57%;
+    
     --muted: 250 30% 15%;
     --muted-foreground: 250 10% 60%;
     
