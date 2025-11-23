@@ -16,8 +16,8 @@ const Splash = () => {
     // Otherwise, show splash then go to account setup
     if (!loading && !user) {
       const timer = setTimeout(() => {
-        navigate('/account-setup');
-      }, 2000);
+        navigate('/login');
+      }, 1500);
 
       return () => clearTimeout(timer);
     }
@@ -26,31 +26,33 @@ const Splash = () => {
   // Show loading indicator if auth is still loading
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background relative overflow-hidden">
+      <div className="flex min-h-screen items-center justify-center bg-[hsl(207,100%,57%)] relative overflow-hidden">
         <div className="text-center space-y-4">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-muted-foreground">Loading...</p>
+          <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-white">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background relative overflow-hidden">
-      {/* Animated gradient background */}
-      <div className="absolute inset-0 bg-gradient-hero opacity-50" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent" />
+    <div className="flex min-h-screen items-center justify-center bg-[hsl(207,100%,57%)] relative overflow-hidden">
+      {/* Blob shapes */}
+      <div className="absolute top-0 left-0 w-96 h-96 bg-[hsl(270,80%,60%)] rounded-full blur-3xl opacity-60 -translate-x-1/2 -translate-y-1/2" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-[hsl(45,98%,70%)] rounded-full blur-3xl opacity-60 translate-x-1/2 -translate-y-1/2" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-[hsl(25,95%,60%)] rounded-full blur-3xl opacity-60 -translate-x-1/2 translate-y-1/2" />
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-[hsl(340,100%,70%)] rounded-full blur-3xl opacity-60 translate-x-1/2 translate-y-1/2" />
       
-      <div className="relative z-10 text-center space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-        <div className="relative inline-block">
-          <h1 className="text-7xl font-black text-gradient-primary animate-float">
-            NUDGE
-          </h1>
-          <div className="absolute -inset-4 bg-primary/20 blur-3xl -z-10 animate-pulse-glow" />
-        </div>
-        <p className="text-2xl font-semibold text-foreground/90 animate-in fade-in duration-1000 delay-300">
-          Let's lock in ✨
-        </p>
+      {/* Floating dots */}
+      <div className="absolute top-1/4 left-1/4 w-4 h-4 bg-[hsl(340,100%,70%)] rounded-full animate-float" />
+      <div className="absolute top-1/3 right-1/3 w-3 h-3 bg-[hsl(45,98%,70%)] rounded-full animate-float" style={{ animationDelay: '0.5s' }} />
+      <div className="absolute bottom-1/3 left-1/3 w-5 h-5 bg-[hsl(340,100%,70%)] rounded-full animate-float" style={{ animationDelay: '1s' }} />
+      <div className="absolute bottom-1/4 right-1/4 w-3 h-3 bg-[hsl(45,98%,70%)] rounded-full animate-float" style={{ animationDelay: '1.5s' }} />
+      
+      <div className="relative z-10 text-center animate-in fade-in duration-700">
+        <h1 className="text-8xl md:text-9xl font-black text-white tracking-tight">
+          Nudge
+        </h1>
       </div>
     </div>
   );
